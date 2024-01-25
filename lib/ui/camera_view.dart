@@ -193,8 +193,15 @@ class _CameraViewState extends State<CameraView> with WidgetsBindingObserver {
   }
 
   @override
-  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async { //method is called when the app lifecycle state changes 
-  //(e.g., when the app is paused or resumed). It starts or stops the image stream accordingly.
+  @override
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    super.didChangeAppLifecycleState(state);
+
+    if (cameraController == null || !cameraController!.value.isInitialized) {
+      // CameraController is not initialized, so we don't proceed further.
+      return;
+    }
+
     switch (state) {
       case AppLifecycleState.paused:
         await cameraController?.stopImageStream();
@@ -202,9 +209,12 @@ class _CameraViewState extends State<CameraView> with WidgetsBindingObserver {
         if (!cameraController!.value.isStreamingImages) {
           await cameraController?.startImageStream(onLatestImageAvailable);
         }
-      default:
+      case AppLifecycleState.detached:
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.hidden:
     }
   }
+
 
   @override
   void dispose() {

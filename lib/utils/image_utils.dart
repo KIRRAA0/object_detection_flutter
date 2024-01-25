@@ -55,7 +55,16 @@ class ImageUtils {
         final u = cameraImage.planes[1].bytes[uvIndex];
         final v = cameraImage.planes[2].bytes[uvIndex];
 
-        image.data?.setPixel(w, h, yuv2rgb(y, u, v) as imageLib.Color);
+        final rgbColor = yuv2rgb(y, u, v);
+
+        // Extract RGB components
+       final r = (rgbColor >> 16) & 0xFF;
+       final g = (rgbColor >> 8) & 0xFF;
+       final b = rgbColor & 0xFF;
+       final a = (rgbColor >> 24) & 0xFF; // Extract alpha value
+
+        // Set the pixel with RGBA values
+        image.setPixelRgba(w, h, r, g, b, a);
       }
     }
     return image;
